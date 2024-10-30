@@ -8,6 +8,7 @@ import io.xor.project.blogapi.repository.PostRepository;
 import io.xor.project.blogapi.repository.implementation.PostDAO;
 import io.xor.project.blogapi.service.IPostService;
 import org.springframework.stereotype.Service;
+import org.yaml.snakeyaml.internal.Logger;
 
 import java.util.List;
 
@@ -28,8 +29,9 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public PostDTO updatePost(PostDTO post, Long id) {
-        return new PostDTO();
+    public PostDTO updatePost(PostDTO newPost, String id ) {
+        Post updatedPost = this.postRepository.updatePost(mapToPost(newPost), id);
+        return mapToDTO(updatedPost);
     }
 
     @Override
@@ -48,8 +50,8 @@ public class PostService implements IPostService {
     }
 
     @Override
-    public void deletePostById(Long id) {
-        return;
+    public void deletePost(PostDTO post) {
+        this.postRepository.deletePost(mapToPost(post));
     }
 
     @Override
@@ -93,7 +95,7 @@ public class PostService implements IPostService {
     private Post mapToPost(PostDTO postDTO) {
         Post post = new Post();
 
-        post.setId(post.getId() != null ? post.getId() : null);
+        post.setId(postDTO.getId() != null ? postDTO.getId() : null);
         post.setDescription(postDTO.getDescription());
         post.setTitle(postDTO.getTitle());
         post.setContent(postDTO.getContent());

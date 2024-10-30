@@ -1,10 +1,11 @@
 package io.xor.project.blogapi.controller;
 
-
 import io.xor.project.blogapi.payload.response.ApiResponse;
 import io.xor.project.blogapi.payload.PostDTO;
 import io.xor.project.blogapi.payload.response.ReadApiResponse;
 import io.xor.project.blogapi.service.implementation.PostService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private static  final Logger logger = LoggerFactory.getLogger(PostController.class);
 
     public PostController(PostService postService) {
         this.postService = postService;
@@ -45,6 +47,22 @@ public class PostController {
                 page, size, total, isLast,
                 HttpStatus.OK.value(), "Success",
                 posts);
+        return new ResponseEntity<>(api, HttpStatus.OK);
+    }
+
+    @PatchMapping
+    public ResponseEntity<ApiResponse> updatePost(@RequestBody PostDTO postDTO) {
+        logger.info("ASDASDASd:" + postDTO.getId());
+        logger.debug("Updating post: " + postDTO.getId());
+        PostDTO updatedPost = this.postService.updatePost(postDTO, postDTO.getId());
+        ApiResponse api = new ApiResponse<>(HttpStatus.OK.value(), "Success", updatedPost);
+        return new ResponseEntity<>(api, HttpStatus.OK);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<ApiResponse> deletePost(@RequestBody PostDTO postDTO) {
+        this.postService.deletePost(postDTO);
+        ApiResponse api = new ApiResponse<>(HttpStatus.OK.value(), "Success", "Data deleted successfully");
         return new ResponseEntity<>(api, HttpStatus.OK);
     }
 

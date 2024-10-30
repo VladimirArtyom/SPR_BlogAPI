@@ -20,8 +20,9 @@ public interface IDAOPost {
     Post getPostById(Long id);
 
     // Put
-    Post updatePost(Post post, String uuid );
+    Post updatePost(Post post, String title );
 
     // Delete
     void deletePost(Post post);
+    void deletePostById(String id);
 }

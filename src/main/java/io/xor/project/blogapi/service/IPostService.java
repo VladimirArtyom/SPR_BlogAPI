@@ -9,11 +9,13 @@ public interface IPostService {
 
     PostDTO createPost(PostDTO post);
     List<PostDTO> createPosts(List<PostDTO> posts);
-    PostDTO updatePost(PostDTO post, Long id);
+
+    PostDTO updatePost(PostDTO new_post, String title);
+
     PostDTO getPost(Long id);
     List<PostDTO> getPosts();
     List<PostDTO> getPosts(int page, int size);
-    void deletePostById(Long id);
+    void deletePost(PostDTO post);
 
     PostDTO getPostByTitle(String title);
     PostDTO getPostById(Long id);
