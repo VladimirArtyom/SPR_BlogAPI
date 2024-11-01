@@ -1,16 +1,11 @@
 package io.xor.project.blogapi.repository.implementation;
-
-
-import io.xor.project.blogapi.annot.OptionallyThrowsError;
 import io.xor.project.blogapi.entity.Post;
-import io.xor.project.blogapi.exception.ResourceNotFoundException;
 import io.xor.project.blogapi.repository.interfaces.IDAOPost;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,40 +50,25 @@ public class PostDAO implements IDAOPost {
         return this.updatePostById(newPost, uuid);
     }
 
-    @OptionallyThrowsError
     @Transactional
     public Post updatePostById(Post newPost, String id) {
         Post old_post_db = new Post();
-        try {
             old_post_db = this.entityManager.find(Post.class, id);
             old_post_db = this.setPost(newPost);
             this.entityManager.merge(old_post_db);
-            return old_post_db;
-
-        } catch (Exception exception) {
-            if (exception instanceof RuntimeException) {
-                throw new ResourceNotFoundException("Post", "id", id);
-            }
-        }
         return old_post_db;
     }
 
     @Override
-    @OptionallyThrowsError
     @Transactional
     public void deletePost(Post post) {
         this.deletePostById(post.getId());
     }
 
     @Override
-    @OptionallyThrowsError
     @Transactional
     public void deletePostById(String id) {
         Post post_db = this.entityManager.find(Post.class, id);
-        if (post_db == null) {
-            throw new ResourceNotFoundException("Post", "id", id);
-        }
-
         this.entityManager.remove(post_db);
     }
 

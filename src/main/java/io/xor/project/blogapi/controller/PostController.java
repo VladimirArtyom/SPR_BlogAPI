@@ -66,6 +66,12 @@ public class PostController {
         return new ResponseEntity<>(api, HttpStatus.OK);
     }
 
+    @GetMapping("/err")
+    public ResponseEntity<String> err() {
+        this.postService.dev_exception();
+        return new ResponseEntity<>("JANCOK", HttpStatus.OK);
+    }
+
     private <T> boolean isLast(int page, int size, List<T> posts) {
         int skip = (page - 1) * size;
         boolean isLast = skip + size > posts.size() + 1;

@@ -2,15 +2,22 @@ package io.xor.project.blogapi.service.implementation;
 
 import io.xor.project.blogapi.annot.OptionallyThrowsError;
 import io.xor.project.blogapi.entity.Post;
-import io.xor.project.blogapi.exception.ResourceNotFoundException;
+import io.xor.project.blogapi.exception.http_exceptions.BadRequestException;
+import io.xor.project.blogapi.exception.http_exceptions.InternalServerException;
+import io.xor.project.blogapi.exception.http_exceptions.NotFoundException;
+import io.xor.project.blogapi.exception.internal_exceptions.IE_NonUniqueResultException;
+import io.xor.project.blogapi.exception.internal_exceptions.IE_PersistenceException;
 import io.xor.project.blogapi.payload.PostDTO;
 import io.xor.project.blogapi.repository.PostRepository;
 import io.xor.project.blogapi.repository.implementation.PostDAO;
 import io.xor.project.blogapi.service.IPostService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.NonUniqueResultException;
+import jakarta.persistence.PersistenceException;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.internal.Logger;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PostService implements IPostService {
@@ -62,24 +69,40 @@ public class PostService implements IPostService {
 
     @Override
     @OptionallyThrowsError
-    public PostDTO getPostByTitle(String title) {
-        Post post = this.postRepository.getPostByTitle(title);
-        if (post == null) {
-            throw new ResourceNotFoundException("Post", "id", post.getId());
+    public Optional<PostDTO> getPostByTitle(String title) {
+        try {
+            Post post = this.postRepository.getPostByTitle(title);
+            return Optional.of(mapToDTO(post));
         }
-
-        return mapToDTO(post);
-        //return new PostDTO();
+         catch (EntityNotFoundException e) {
+             throw new NotFoundException("Post", "title", title);
+        } catch (NonUniqueResultException e) {
+            throw new IE_NonUniqueResultException("Post", "Title is expected to return 1, but multiples returned", e.getMessage());
+        } catch (PersistenceException e) {
+            throw new IE_PersistenceException("Post",e.getMessage());
+        }
     }
 
     @Override
-    public PostDTO getPostById(Long id) {
+    public Optional<PostDTO> getPostById(Long id) {
         return null;
     }
 
     @Override
-    public List<PostDTO> getPostsByTitle(String title) {
-        return List.of();
+    public Optional<List<PostDTO>> getPostsByTitle(String title) {
+        try {
+            return Optional.of(this.postRepository.getPostsByTitle(title).stream().map(this::mapToDTO).toList());
+        }catch (EntityNotFoundException e) {
+            throw new NotFoundException("Post", "title", title);
+        } catch (PersistenceException e) {
+            throw new IE_PersistenceException("Post", e.getMessage());
+        }
+    }
+
+    @Override
+    public void dev_exception() {
+        throw new IE_PersistenceException("POST", "HERE ARE THE DETAILS");
+        //throw new NotFoundException("Post", "title", "dev_exception");
     }
 
     private PostDTO mapToDTO(io.xor.project.blogapi.entity.Post post) {

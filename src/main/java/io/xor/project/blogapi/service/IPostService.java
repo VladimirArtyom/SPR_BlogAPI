@@ -4,6 +4,7 @@ import io.xor.project.blogapi.entity.Post;
 import io.xor.project.blogapi.payload.PostDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IPostService {
 
@@ -17,8 +18,9 @@ public interface IPostService {
     List<PostDTO> getPosts(int page, int size);
     void deletePost(PostDTO post);
 
-    PostDTO getPostByTitle(String title);
-    PostDTO getPostById(Long id);
-    List<PostDTO> getPostsByTitle(String title);
+    Optional<PostDTO> getPostByTitle(String title);
+    Optional<PostDTO> getPostById(Long id);
+    Optional<List<PostDTO>> getPostsByTitle(String title);
 
+    void dev_exception();
 }
